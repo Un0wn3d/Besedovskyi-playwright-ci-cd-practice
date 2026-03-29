@@ -1,0 +1,107 @@
+import { test, expect } from '@playwright/test';
+
+test('Взаємодія з елементами форми та використання бібліотеки локаторів', async ({ page }) => {
+
+// 1. Будуємо бібліотеку локаторів для усіх елементів форми
+   const locators = {
+       // Локатори, необхідні для переходу на сторінку з тестовими формами
+       practiceFormsLink: page.locator('a[href="/forms"]'),
+       practiceFormLink: page.locator('a[href="/automation-practice-form"]'),
+
+       // Локатори "піддослідних" елементів форми
+       form: page.locator('form#userForm'),
+      
+       // Текстові поля (Text Inputs) - найнадійніше шукати за унікальним id
+       firstNameInput: page.locator('#firstName'),
+       lastNameInput: page.locator('#lastName'),
+       userEmailInput: page.locator('#userEmail'),
+      
+       // Радіокнопки (Radio Buttons) - часто <input> перекритий або прихований CSS стилями.
+       // Найстабільніший клік забезпечується через відповідний <label>
+       genderRadioMale: page.locator('label[for="gender-radio-1"]'),
+       genderRadioFemale: page.locator('label[for="gender-radio-2"]'),
+       genderRadioOther: page.locator('label[for="gender-radio-3"]'),
+      
+       // Поле вводу мобільного номера
+       userNumberInput: page.locator('#userNumber'),
+      
+       // Поле дати народження (Datepicker)
+       dateOfBirthInput: page.locator('#dateOfBirthInput'),
+      
+       // Автодоповнення (Auto-complete) - складений компонент, шукаємо саме поле вводу
+       subjectsInput: page.locator('#subjectsInput'),
+      
+       // Чекбокси (Checkboxes) - ситуація аналогічна до радіокнопок, використовуємо label
+       hobbiesCheckboxSports: page.locator('label[for="hobbies-checkbox-1"]'),
+       hobbiesCheckboxReading: page.locator('label[for="hobbies-checkbox-2"]'),
+       hobbiesCheckboxMusic: page.locator('label[for="hobbies-checkbox-3"]'),
+      
+       // Завантаження файлу (File Input)
+       uploadPictureInput: page.locator('#uploadPicture'),
+      
+       // Багаторядкове текстове поле
+       currentAddressTextarea: page.locator('#currentAddress'),
+      
+       // Випадаючі списки (React Select) - це не стандартні теги <select>.
+       // Для взаємодії з ними потрібно вводити текст у прихований input
+
+       // Використовуємо CSS-селектор з пробілом (пошук нащадка нащадок), щоб знайти точний input
+       // всередині контейнерів з незмінними id (#state та #city)
+
+       //state
+       stateDropdownWrapper: page.locator('#state'),
+       stateDropdownInput: page.locator('#state input'),
+       //city
+       cityDropdownWrapper: page.locator('#city'),
+       cityDropdownInput: page.locator('#city input'),
+      
+       // Кнопка відправки форми - найкраще шукати за роллю та видимим текстом або за id
+       submitButton: page.locator('#submit')
+   }
+
+   // 2. Навігація
+   // Переходимо на потрібну сторінку і у декілька кліків відкриваємо потрібну форму.
+   await page.goto('https://demoqa.com/')
+   await locators.practiceFormsLink.click()
+   await locators.practiceFormLink.click()
+
+   // 3. Валідація. Перевіряємо, що всі необхідні елементи присутні на сторінці
+   // (у даному випадку не використовуємо toBeVisible, оскільки деякі елементи можуть бути прихованими)
+   for (const element of Object.values(locators)) {
+       if (element === locators.practiceFormsLink || element === locators.practiceFormLink) continue;
+       await expect(element).toBeAttached()
+   }
+
+
+
+   // 4. Реалізація автоматизації взаємодії з елементами форми
+
+   // .fill()
+   await locators.firstNameInput.fill('Вадим')
+   await locators.lastNameInput.fill('Беседовський')
+   await locators.userEmailInput.fill('vadym.besedovskyi@example.com')
+   await locators.userNumberInput.fill('1234567890')
+   await locators.currentAddressTextarea.fill('Харків')
+
+   // .check()
+   await locators.genderRadioMale.click()
+   await locators.hobbiesCheckboxSports.click()
+   await locators.hobbiesCheckboxReading.click()
+
+   // .fill() + .press() для нестандартних полів (Datepicker, Auto-complete)
+   await locators.subjectsInput.fill('Maths')
+   await locators.subjectsInput.press('Enter')
+
+   // Dropbox React Select: .click() + .fill() + .press()
+   await locators.stateDropdownWrapper.click({ force: true })
+   await locators.stateDropdownInput.fill('Haryana')
+   await locators.stateDropdownInput.press('Enter')
+
+   await locators.cityDropdownWrapper.click({ force: true })
+   await locators.cityDropdownInput.fill('Karnal')
+   await locators.cityDropdownInput.press('Enter')
+
+   // .click() — відправка форми
+   await locators.submitButton.click()
+
+})

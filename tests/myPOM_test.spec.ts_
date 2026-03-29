@@ -1,0 +1,19 @@
+import { test, expect } from '@playwright/test'
+import { MyFormPage } from '../pages/MyFormPage'
+
+test('Користувач може успішно залогінитись (POM)', async ({ page }) => {
+  // 1. Створюємо екземпляр Page Object
+  // Передаємо page в конструктор, щоб клас міг керувати браузером
+  const myFormPage = new MyFormPage(page)
+
+  // 2. Використовуємо методи класу замість прямих команд до page.locator...
+  await myFormPage.goto()
+
+  // Виконуємо дію одним рядком
+  await myFormPage.login('invalid_user', 'invalid_pass')
+
+  // 3. Перевірка (Assertion)
+  // Перевіряємо, що після відправки форми з'явилось повідомлення про помилку
+  await expect(myFormPage.errorMessage).toBeVisible()
+  await expect(myFormPage.errorMessage).toContainText('Невірний логін або пароль')
+})
