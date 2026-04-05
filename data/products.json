@@ -18,25 +18,5 @@
     "id": 4,
     "title": "Red Lipstick",
     "expectedPrice": 12.99
-  },
-  {
-    "id": 5,
-    "title": "iPhone 9",
-    "expectedPrice": 549
-  },
-  {
-    "id": 6,
-    "title": "iPhone X",
-    "expectedPrice": 899
-  },
-  {
-    "id": 7,
-    "title": "Samsung Universe 9",
-    "expectedPrice": 1249
-  },
-  {
-    "id": 8,
-    "title": "OPPOF19",
-    "expectedPrice": 280
   }
 ]
